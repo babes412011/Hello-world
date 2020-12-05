@@ -1,4 +1,4 @@
-# class
+# Number guessing game with difficulty level
 from tkinter import *
 import random
 from tkinter import font as tkFont
