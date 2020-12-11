@@ -1,3 +1,4 @@
+# lots of room for improvement might make a v.2
 from tkinter import *
 import random
 
