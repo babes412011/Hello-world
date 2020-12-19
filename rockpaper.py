@@ -1,4 +1,4 @@
-import tkinter as tk
+import tkinter as tk #not yet done
 import random
 from PIL import ImageTk, Image
 import os
