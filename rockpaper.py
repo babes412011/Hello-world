@@ -1,4 +1,4 @@
-import tkinter as tk
+import tkinter as tk #rps game with image and toss coin as a tie breaker
 import random
 from PIL import ImageTk, Image
 import os
