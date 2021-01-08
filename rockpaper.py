@@ -1,4 +1,4 @@
-import tkinter as tk #rps game with image and toss coin as a tie breaker
+import tkinter as tk #optional tosscoin
 import random
 from PIL import ImageTk, Image
 import os
@@ -9,16 +9,18 @@ class RPSgame(tk.Frame):
         tk.Frame.__init__(self, self.master)
         self.mypoints = 0
         self.pcpoints = 0
-        
         self.gui_setting()
+        self.on_off = 'ON'
         self.widget()
-        
+        self.rock['state'] = tk.DISABLED
+        self.paper['state'] = tk.DISABLED
+        self.scissors['state'] = tk.DISABLED
         
     
     
     def gui_setting(self): 
         root.title('Rock, Paper, Scissor')
-        root.geometry('800x520')
+        root.geometry('800x570')
         root.config(bg = "#c1cbdb")
         root.grid_columnconfigure(1,weight=1)
         root.grid_rowconfigure(0,weight=1)   
@@ -30,7 +32,7 @@ class RPSgame(tk.Frame):
         frame1 = tk.Frame(root, bg='#6c7a70')
         frame1.pack(side='top')
             
-        frame2 = tk.Frame(root, bg='#424f45')
+        frame2 = tk.Frame(root, bg='#222326')
         frame2.pack()
             
         frame3 = tk.Frame(root, bg='#6c7a70')
@@ -61,13 +63,45 @@ class RPSgame(tk.Frame):
         self.scissors = tk.Button(frame3, text='SCISSORS', width=10, padx=20, pady=10, command=lambda: self.player_choice('scissors'))
         self.scissors.grid(row=0, column=2, padx=5, pady=5, sticky='n,s,w,e')
 
+        self.gamemode = tk.Button(frame3, text='Game Mode', width=10, padx=20, pady=10,command=self.mode)
+        self.gamemode.grid(row=1, column=1, padx=5, pady=5, sticky='n,s,w,e')
+        
+        self.gamereset = tk.Button(frame3, text="Reset", width=10, padx=20, pady=10, command=self.greset)
+        self.gamereset.grid(row=1,column=0, padx=5, pady=5, sticky='n,s,w,e')
+
+        self.tossoff = tk.Button(frame3, text='TossCoin On/Off', width=10, padx=20, pady=10,command=self.toss_button)
+        self.tossoff.grid(row=1, column=2,padx=5, pady=5, sticky='n,s,w,e')
+        
+        self.toss_text = tk.Text(frame3, width=20, height=1)
+        self.toss_text.grid(row=2,column=0, columnspan=3,sticky='n,s,w,e')
+        self.toss_text.tag_configure("center", justify='center')
+        self.toss_text.insert('1.0', 'Tosscoin')
+        self.toss_text.tag_add("center", "1.0", "end")
+    
+    def toss_button(self):
+        
+        if self.on_off == 'OFF':
+            self.on_off = 'ON'
+            self.toss_text.delete('1.0', 'end')
+            self.toss_text.insert('1.0', 'Toss Coin Turned On')
+            self.toss_text.tag_add("center", "1.0", "end")
+        elif self.on_off == 'ON':
+            self.on_off = 'OFF'
+            self.toss_text.delete('1.0', 'end')
+            self.toss_text.insert('1.0', 'Toss Coin Turned Off')
+            self.toss_text.tag_add("center", "1.0", "end")   
+    
     def player_choice(self, choice):
         self.choice = choice
         self.weopon_choice()
         self.label2.configure(image=self.imgs, width=250, height=325)
         self.pc_choice()
         self.compare()
-    
+        if self.mypoints == self.bpoints or self.pcpoints == self.bpoints:
+            self.points.delete(1.0, 'end')
+            self.points.insert('end', 'Player:' + str(self.mypoints) + '\nPc:' + str(self.pcpoints) + '\nEnd Game')
+            self.reset()
+            
     def weopon_choice(self):
         self.player_image = os.listdir('C:\\Users\\Photoshop\\Desktop\\VScode\\rockpaperscissors\\' + self.choice)
         num = random.randint(0,(len(self.player_image)-1))
@@ -122,16 +156,54 @@ class RPSgame(tk.Frame):
             self.mypoints += 1
             self.addpoints()
         elif self.ans != self.coin:
-            self.toplabel.configure(text='Sorry, The Answer is ' + self.coin)
+            self.toplabel.configure(text='Sorry, The Answer is ' + self.coin + ' 1 point for PC')
+            self.pcpoints += 1
+            self.addpoints()
+        if self.mypoints == self.bpoints or self.pcpoints == self.bpoints:
+            self.points.delete(1.0, 'end')
+            self.points.insert('end', 'Player:' + str(self.mypoints) + '\nPc:' + str(self.pcpoints) + '\nEnd Game')
+            self.reset()
         self.heads['state'] = tk.DISABLED
         self.tails['state'] = tk.DISABLED
     
-    def compare(self):
+    
+    def reset(self):
+        self.mypoints = 0
+        self.pcpoints = 0
+        self.rock['state'] = tk.DISABLED
+        self.paper['state'] = tk.DISABLED
+        self.scissors['state'] = tk.DISABLED
+        self.gamemode['state'] = tk.DISABLED
         
-        if self.choice == self.pcchoice:
-            self.draw()
+    
+    def greset(self):
+        self.reset()
+        self.addpoints()
+        self.gamemode['state'] = tk.NORMAL
+    
+    def mode(self):
+        self.topmode = tk.Toplevel(self.master)
+        self.topmode.title("Choose a Mode")
+        self.topmode.geometry('300x220')
+        self.mbutton1 = tk.Button(self.topmode, text='Best of 3',padx=6,pady=6,command=lambda:self.best(3))
+        self.mbutton1.pack()
+        self.mbutton2 = tk.Button(self.topmode, text='Best of 5',padx=6,pady=6,command=lambda:self.best(5))
+        self.mbutton2.pack()
+
+    def best(self,bestnum):
+        self.bpoints = bestnum
+        self.rock['state'] = tk.NORMAL
+        self.paper['state'] = tk.NORMAL
+        self.scissors['state'] = tk.NORMAL
+        self.topmode.destroy()
+    
+    def compare(self):
+        if self.on_off == 'ON':
+            if self.choice == self.pcchoice:
+                self.draw()
+        
             
-        elif self.choice == 'rock':
+        if self.choice == 'rock':
             if self.pcchoice == 'scissors':
                 self.mypoints += 1
                 self.addpoints()
@@ -152,8 +224,7 @@ class RPSgame(tk.Frame):
             elif self.pcchoice == 'rock':
                 self.pcpoints += 1
                 self.addpoints()
-                
-
+        
 
 
 if __name__ == '__main__':
