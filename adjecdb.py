@@ -5,7 +5,7 @@ class adj_database:
         self.conn = sqlite3.connect(adjecdb)
         self.cur = self.conn.cursor()
         #self.cur.execute('CREATE TABLE foodadjective (adjective TEXT)')
-        #self.cur.execute("INSERT INTO foodadjective VALUES ('SALTY,')")
+        
         self.conn.commit()
 
     def get_data(self):
